@@ -23,7 +23,7 @@ func main() {
 		fmt.Println("参数"+strconv.Itoa(idx)+":", args)
 	}
 
-	if len(os.Args) <= 2 {
+	if len(os.Args) < 2 {
 		//upload("./file/file.txt")
 		//postFile("./file/file.txt", "http://localhost:8080/upload")
 		return
@@ -66,6 +66,7 @@ func postFile(filename string, targetUrl string) error {
 	}
 
 	contentType := bodyWriter.FormDataContentType()
+	fmt.Println(contentType)
 	bodyWriter.Close()
 
 	resp, err := http.Post(targetUrl, contentType, bodyBuf)
