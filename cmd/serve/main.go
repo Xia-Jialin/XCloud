@@ -1,6 +1,7 @@
 package main
 
 import (
+	"XCloud/dao"
 	"fmt"
 	"io"
 	"log"
@@ -56,12 +57,36 @@ func LsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	userName := r.Form.Get("userName")
+	if userName == "" {
+		log.Println("userName:"+userName)
+		return
+	}
+
+	password := r.Form.Get("password")
+	if password == "" {
+		log.Println("password:"+password)
+		return
+	}
+
+	if userName != "123" || password != "123" {
+		return
+	}
+	fmt.Fprintln(w, "ok")
+}
+
 func main() {
+	a := dao.CreateUserInfoDao()
+	a.DeleteUser("123x")
+
 	http.HandleFunc("/hello", HelloServer)
 	//file
 	http.HandleFunc("/upload", uploadHandler)
 	http.HandleFunc("/download", HelloServer)
 	http.HandleFunc("/ls", LsHandler)
+	http.HandleFunc("/login", LoginHandler)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

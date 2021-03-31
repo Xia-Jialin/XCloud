@@ -8,8 +8,10 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func init() {
@@ -26,6 +28,7 @@ func main() {
 	if len(os.Args) < 2 {
 		//upload("./file/file.txt")
 		//postFile("./file/file.txt", "http://localhost:8080/upload")
+		longin()
 		return
 	}
 	//command := strconv.Itoa(1)
@@ -36,6 +39,10 @@ func main() {
 	}
 	if command == "ls" {
 		getDisk()
+		return
+	}
+	if command == "login" {
+		longin()
 		return
 	}
 }
@@ -98,4 +105,27 @@ func getDisk() {
 		log.Println(err.Error())
 	}
 	fmt.Printf("%s\n", b)
+}
+
+func longin() {
+	urlValue := url.Values{
+		"userName": {"123"},
+		"password": {"123"},
+	}
+	reqBody := urlValue.Encode()
+	//strReader := strings.NewReader("userName=123&password=123")
+	resp, err := http.Post("http://localhost:8080/login",
+		"application/x-www-form-urlencoded",
+		strings.NewReader(reqBody))
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// handle error
+	}
+
+	fmt.Println(string(body))
 }

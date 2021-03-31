@@ -1,3 +1,5 @@
 cmd/serve/__debug_bin
 *.exe
 file
+vendor
+main.go
