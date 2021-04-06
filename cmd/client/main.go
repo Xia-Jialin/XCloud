@@ -26,8 +26,6 @@ func main() {
 	}
 
 	if len(os.Args) < 2 {
-		//upload("./file/file.txt")
-		//postFile("./file/file.txt", "http://localhost:8080/upload")
 		longin()
 		return
 	}
