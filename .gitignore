@@ -3,3 +3,4 @@ cmd/serve/__debug_bin
 file
 vendor
 main.go
+go.sum

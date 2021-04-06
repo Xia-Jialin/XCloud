@@ -12,6 +12,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/howeyc/gopass"
 )
 
 func init() {
@@ -26,10 +28,11 @@ func main() {
 	}
 
 	if len(os.Args) < 2 {
-		longin()
 		return
 	}
-	//command := strconv.Itoa(1)
+	userName := os.Args[1]
+	password := GetPassword()
+	longin(userName, password)
 	command := os.Args[1]
 	if command == "upload" {
 		postFile(os.Args[2], "http://localhost:8080/upload")
@@ -40,7 +43,7 @@ func main() {
 		return
 	}
 	if command == "login" {
-		longin()
+		longin("", "")
 		return
 	}
 }
@@ -105,10 +108,10 @@ func getDisk() {
 	fmt.Printf("%s\n", b)
 }
 
-func longin() {
+func longin(userName, password string) {
 	urlValue := url.Values{
-		"userName": {"123"},
-		"password": {"123"},
+		"userName": {userName},
+		"password": {password},
 	}
 	reqBody := urlValue.Encode()
 	//strReader := strings.NewReader("userName=123&password=123")
@@ -126,4 +129,13 @@ func longin() {
 	}
 
 	fmt.Println(string(body))
+}
+
+func GetPassword() string {
+	fmt.Print("password:")
+	pass, err := gopass.GetPasswd()
+	if err != nil {
+		return ""
+	}
+	return string(pass)
 }
