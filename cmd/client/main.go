@@ -8,6 +8,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"os"
 	"strconv"
@@ -32,19 +33,32 @@ func main() {
 	}
 	userName := os.Args[1]
 	password := GetPassword()
-	longin(userName, password)
-	command := os.Args[1]
-	if command == "upload" {
-		postFile(os.Args[2], "http://localhost:8080/upload")
-		return
+	resp, err := longin(userName, password)
+	if err != nil {
+
 	}
-	if command == "ls" {
-		getDisk()
-		return
-	}
-	if command == "login" {
-		longin("", "")
-		return
+	var command, value, value2 string
+
+	for {
+		fmt.Print("xcloud>>")
+		fmt.Scanln(&command, &value, &value2)
+
+		if command == "upload" {
+			postFile(value, "http://localhost:8080/upload")
+			continue
+		}
+		if command == "ls" {
+			getDisk(resp)
+			continue
+		}
+		if command == "login" {
+			longin(value, value2)
+			continue
+		}
+		if command == "exit" {
+			fmt.Println("bye!")
+			break
+		}
 	}
 }
 
@@ -94,13 +108,17 @@ func postFile(filename string, targetUrl string) error {
 }
 
 //获取网盘文件
-func getDisk() {
-	resp, err := http.Get("http://localhost:8080/ls")
+func getDisk(client *http.Client) {
+	resp, err := client.Get("http://localhost:8080/ls")
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println(resp.Status)
+		return
+	}
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err.Error())
@@ -108,27 +126,31 @@ func getDisk() {
 	fmt.Printf("%s\n", b)
 }
 
-func longin(userName, password string) {
+func longin(userName, password string) (*http.Client, error) {
+	jar, _ := cookiejar.New(nil)
+
+	client := http.Client{
+		Jar: jar,
+	}
+
 	urlValue := url.Values{
 		"userName": {userName},
 		"password": {password},
 	}
+
 	reqBody := urlValue.Encode()
-	//strReader := strings.NewReader("userName=123&password=123")
-	resp, err := http.Post("http://localhost:8080/login",
-		"application/x-www-form-urlencoded",
-		strings.NewReader(reqBody))
+	resp, err := client.Post("http://localhost:8080/login", "application/x-www-form-urlencoded", strings.NewReader(reqBody))
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	_, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		// handle error
+		return nil, err
 	}
 
-	fmt.Println(string(body))
+	return &client, nil
 }
 
 func GetPassword() string {

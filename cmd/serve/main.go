@@ -29,7 +29,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf(err.Error())
 		return
 	}
-	dst, err := os.Create("./file/" + path.Base(head.Filename) + ".upload")
+	dst, err := os.Create("./file/" + path.Base(head.Filename))
 	if err != nil {
 		log.Printf(err.Error())
 		return
@@ -43,6 +43,16 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LsHandler(w http.ResponseWriter, r *http.Request) {
+	value, err := r.Cookie("xCloud_id")
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	if value.Value != "xxx" {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	dir, error := os.OpenFile("./file/", os.O_RDONLY, os.ModeDir)
 	if error != nil {
 		defer dir.Close()
@@ -61,20 +71,24 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	userName := r.Form.Get("userName")
 	if userName == "" {
-		log.Println("userName:"+userName)
+		log.Println("userName:" + userName)
 		return
 	}
 
 	password := r.Form.Get("password")
 	if password == "" {
-		log.Println("password:"+password)
+		log.Println("password:" + password)
 		return
 	}
 
 	if userName != "123" || password != "123" {
 		return
 	}
-	fmt.Fprintln(w, "ok")
+	cookie := http.Cookie{
+		Name:  "xCloud_id",
+		Value: "xxx",
+	}
+	http.SetCookie(w, &cookie)
 }
 
 func main() {
