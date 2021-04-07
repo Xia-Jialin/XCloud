@@ -11,6 +11,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 
@@ -44,7 +45,7 @@ func main() {
 		fmt.Scanln(&command, &value, &value2)
 
 		if command == "upload" {
-			postFile(value, "http://localhost:8080/upload")
+			postFile(filePathChanging(value), "http://localhost:8080/upload")
 			continue
 		}
 		if command == "ls" {
@@ -68,7 +69,7 @@ func postFile(filename string, targetUrl string) error {
 	bodyWriter := multipart.NewWriter(bodyBuf)
 
 	//关键的一步操作
-	fileWriter, err := bodyWriter.CreateFormFile("files", filename)
+	fileWriter, err := bodyWriter.CreateFormFile("files", path.Base(filename))
 	if err != nil {
 		fmt.Println("error writing to buffer")
 		return err
@@ -160,4 +161,8 @@ func GetPassword() string {
 		return ""
 	}
 	return string(pass)
+}
+
+func filePathChanging(filePath string) string {
+	return strings.Replace(filePath, "\\", "/", -1)
 }
