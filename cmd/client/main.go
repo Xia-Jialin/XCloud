@@ -36,7 +36,8 @@ func main() {
 	password := GetPassword()
 	resp, err := longin(userName, password)
 	if err != nil {
-
+		log.Println("登陆失败")
+		return
 	}
 	var command, value, value2 string
 
@@ -94,12 +95,14 @@ func postFile(filename string, targetUrl string) error {
 
 	resp, err := http.Post(targetUrl, contentType, bodyBuf)
 	if err != nil {
+		log.Println("上传失败")
 		return err
 	}
 	defer resp.Body.Close()
 
 	resp_body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Println("上传失败")
 		return err
 	}
 	fmt.Println(resp.Status)
@@ -142,6 +145,7 @@ func longin(userName, password string) (*http.Client, error) {
 	reqBody := urlValue.Encode()
 	resp, err := client.Post("http://localhost:8080/login", "application/x-www-form-urlencoded", strings.NewReader(reqBody))
 	if err != nil {
+		log.Println("登录失败")
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -151,6 +155,7 @@ func longin(userName, password string) (*http.Client, error) {
 		return nil, err
 	}
 
+	log.Println("登陆成功")
 	return &client, nil
 }
 

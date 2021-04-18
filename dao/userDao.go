@@ -23,10 +23,6 @@ func init() {
 	}
 	// 自动迁移
 	db.AutoMigrate(&model.UserInfo{})
-	u1 := model.UserInfo{UserName:"123", Password:"123", RootDirectory:"x123"}
-
-	// 创建记录
-	db.Create(&u1)
 }
 
 func CreateUserInfoDao() UserInfoDao {
