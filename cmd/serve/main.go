@@ -102,6 +102,47 @@ func PathExists(path string) (bool, error) {
 	}
 	return false, err
 }
+func handleDownload(w http.ResponseWriter, request *http.Request) {
+	//文件上传只允许GET方法
+	if request.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		_, _ = w.Write([]byte("Method not allowed"))
+		return
+	}
+
+	fmt.Println(request.URL)
+	//文件名
+	request.ParseForm()
+	//q := request.URL.Query()
+	filename := request.FormValue("filename")
+	//filename := q.Get("filename")
+	if filename == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = io.WriteString(w, "Bad request")
+		return
+	}
+	log.Println("filename: " + filename)
+	//打开文件
+	file, err := os.Open("./file" + "/" + filename)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = io.WriteString(w, "Bad request")
+		return
+	}
+	//结束后关闭文件
+	defer file.Close()
+
+	//设置响应的header头
+	w.Header().Add("Content-type", "application/octet-stream")
+	w.Header().Add("content-disposition", "attachment; filename=\""+filename+"\"")
+	//将文件写至responseBody
+	_, err = io.Copy(w, file)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = io.WriteString(w, "Bad request")
+		return
+	}
+}
 
 func main() {
 	a := dao.CreateUserInfoDao()
@@ -110,7 +151,7 @@ func main() {
 	http.HandleFunc("/hello", HelloServer)
 	//file
 	http.HandleFunc("/upload", uploadHandler)
-	http.HandleFunc("/download", HelloServer)
+	http.HandleFunc("/down", handleDownload)
 	http.HandleFunc("/ls", LsHandler)
 	http.HandleFunc("/login", LoginHandler)
 	err := http.ListenAndServe(":8080", nil)

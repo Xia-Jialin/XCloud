@@ -53,6 +53,10 @@ func main() {
 			getDisk(resp)
 			continue
 		}
+		if command == "down" {
+			downFile(value)
+			continue
+		}
 		if command == "login" {
 			longin(value, value2)
 			continue
@@ -170,4 +174,29 @@ func GetPassword() string {
 
 func filePathChanging(filePath string) string {
 	return strings.Replace(filePath, "\\", "/", -1)
+}
+
+//下载文件
+func downFile(filename string) {
+	url := "http://localhost:8080/down?filename=" + filename
+	fmt.Println(url)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("下载失败！")
+		return
+	}
+	defer resp.Body.Close()
+
+	out, err := os.Create(filename)
+	if err != nil {
+		fmt.Println("创建失败！")
+		return
+	}
+	defer out.Close()
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		fmt.Println("保存失败！")
+		return
+	}
 }
