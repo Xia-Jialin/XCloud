@@ -2,6 +2,7 @@ package dao
 
 import (
 	"XCloud/model"
+	"errors"
 	"fmt"
 
 	"github.com/jinzhu/gorm"
@@ -29,6 +30,25 @@ func CreateUserInfoDao() UserInfoDao {
 	var userInfo UserInfoDao
 	userInfo = new(UserInfoDaoMysql)
 	return userInfo
+}
+
+func UserAuthentication(userName, password string) (isPass bool, err error) {
+	if "" == userName {
+		err = errors.New("userName:nil")
+		return false, err
+	}
+	if "" == password {
+		err = errors.New("password:nil")
+		return false, err
+	}
+
+	var user model.UserInfo
+	db.Where("UserName = ?", userName).First(&user)
+
+	if user.Password != password {
+		return false, nil
+	}
+	return true, nil
 }
 
 type UserInfoDaoMysql struct {

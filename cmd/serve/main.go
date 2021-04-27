@@ -81,7 +81,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if userName != "123" || password != "123" {
+	pass, err := dao.UserAuthentication(userName, password)
+	if !pass || err != nil {
 		return
 	}
 	cookie := http.Cookie{
