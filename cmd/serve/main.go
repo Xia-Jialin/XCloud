@@ -145,6 +145,7 @@ func handleDownload(w http.ResponseWriter, request *http.Request) {
 }
 
 func main() {
+	dao.Connect(os.Args[1], os.Args[2], os.Args[2])
 	a := dao.CreateUserInfoDao()
 	a.DeleteUser("123x")
 

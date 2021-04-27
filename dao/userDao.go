@@ -15,9 +15,9 @@ type UserInfoDao interface {
 
 var db *gorm.DB
 
-func init() {
+func Connect(ip, dbName, password string) {
 	var err error
-	db, err = gorm.Open("mysql", "root:root@(127.0.0.1:3306)/xcoluddb?charset=utf8mb4&parseTime=True&loc=Local")
+	db, err = gorm.Open("mysql", dbName+":"+password+"@("+ip+")/xcoluddb?charset=utf8mb4&parseTime=True&loc=Local")
 	if err != nil {
 		panic(err)
 	}
