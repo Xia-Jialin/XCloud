@@ -1,5 +1,7 @@
 package es
 
+import "fmt"
+
 type Metadata struct {
 	Name    string
 	Version int
@@ -8,5 +10,5 @@ type Metadata struct {
 }
 
 func SearchAllVersions(name string, from, size int) ([]Metadata, error) {
-	return nil, nil
+	return nil, fmt.Errorf("This method is not implemented")
 }
