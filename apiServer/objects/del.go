@@ -1,12 +1,13 @@
 package objects
 
 import (
+	"XCloud/lib/es"
 	"log"
 	"net/http"
 	"strings"
 )
 
-func del(w http.ResponseWriter, r *http.Request){
+func del(w http.ResponseWriter, r *http.Request) {
 	name := strings.Split(r.URL.EscapedPath(), "/")[2]
 	version, e := es.SearchLatestVersion(name)
 	if e != nil {
