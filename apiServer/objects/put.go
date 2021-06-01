@@ -1,6 +1,7 @@
 package objects
 
 import (
+	"XCloud/lib/utils"
 	"log"
 	"net/http"
 	"net/url"
@@ -9,7 +10,7 @@ import (
 
 func put(w http.ResponseWriter, r *http.Request) {
 	hash := utils.GetHashFromHeader(r.Header)
-	if hash != nil {
+	if hash == "" {
 		log.Println("missing object hash in digest header")
 		w.WriteHeader(http.StatusBadRequest)
 		return
