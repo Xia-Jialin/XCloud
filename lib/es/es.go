@@ -73,6 +73,7 @@ func PutMetadata(name string, version int, size int64, hash string) error {
 	client := http.Client{}
 	url := fmt.Sprintf("http://%s/metadata/objects/%s_%d?op_type=create", os.Getenv("ES_SERVER"), name, version)
 	request, _ := http.NewRequest("PUT", url, strings.NewReader(doc))
+	request.Header.Set("Content-Type", "application/json")
 	r, e := client.Do(request)
 	if e != nil {
 		return e
