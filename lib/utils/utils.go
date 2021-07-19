@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -9,7 +8,6 @@ import (
 func GetHashFromHeader(h http.Header) string {
 	digest := h.Get("digest")
 	if len(digest) < 9 {
-		fmt.Println("xx")
 		return ""
 	}
 	if digest[:8] != "SHA-256=" {
