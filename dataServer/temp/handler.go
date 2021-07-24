@@ -1,4 +1,4 @@
-package objects
+package temp
 
 import "net/http"
 
@@ -8,8 +8,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		put(w, r)
 		return
 	}
-	if m == http.MethodGet {
-		get(w, r)
+	if m == http.MethodPatch {
+		patch(w, r)
+		return
+	}
+	if m == http.MethodPost {
+		post(w, r)
 		return
 	}
 	if m == http.MethodDelete {

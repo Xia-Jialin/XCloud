@@ -20,4 +20,3 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	b, _ := json.Marshal(info)
 	w.Write(b)
 }
-
