@@ -55,3 +55,7 @@ func (w *TempPutStream) Commit(good bool) {
 	client := http.Client{}
 	client.Do(request)
 }
+
+func NewTempGetStream(server, uuid string) (*GetStream, error) {
+	return newGetStream("http://" + server + "/temp/" + uuid)
+}
