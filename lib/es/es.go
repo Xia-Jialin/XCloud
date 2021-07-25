@@ -114,3 +114,61 @@ func SearchAllVersions(name string, from, size int) ([]Metadata, error) {
 	}
 	return metas, nil
 }
+
+type Bucket struct {
+	Key         string
+	Doc_count   int
+	Min_version struct {
+		Value float32
+	}
+}
+
+type aggregateResult struct {
+	Aggregations struct {
+		Group_by_name struct {
+			Buckets []Bucket
+		}
+	}
+}
+
+func SearchVersionStatus(min_doc_count int) ([]Bucket, error) {
+	client := http.Client{}
+	url := fmt.Sprintf("http://%s/metadata/_search", os.Getenv("ES_SERVER"))
+	body := fmt.Sprintf(`
+        {
+          "size": 0,
+          "aggs": {
+            "group_by_name": {
+              "terms": {
+                "field": "name",
+                "min_doc_count": %d
+              },
+              "aggs": {
+                "min_version": {
+                  "min": {
+                    "field": "version"
+                  }
+                }
+              }
+            }
+          }
+        }`, min_doc_count)
+	request, _ := http.NewRequest("GET", url, strings.NewReader(body))
+	request.Header.Set("Content-Type", "application/json")
+	r, e := client.Do(request)
+	if e != nil {
+		return nil, e
+	}
+	b, _ := ioutil.ReadAll(r.Body)
+	var ar aggregateResult
+	json.Unmarshal(b, &ar)
+	return ar.Aggregations.Group_by_name.Buckets, nil
+}
+
+func DelMetadata(name string, version int) {
+	client := http.Client{}
+	url := fmt.Sprintf("http://%s/metadata/objects/%s_%d",
+		os.Getenv("ES_SERVER"), name, version)
+	request, _ := http.NewRequest("DELETE", url, nil)
+	client.Do(request)
+}
