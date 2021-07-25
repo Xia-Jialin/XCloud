@@ -172,3 +172,15 @@ func DelMetadata(name string, version int) {
 	request, _ := http.NewRequest("DELETE", url, nil)
 	client.Do(request)
 }
+
+func HasHash(hash string) (bool, error) {
+	url := fmt.Sprintf("http://%s/metadata/_search?q=hash:%s&size=0", os.Getenv("ES_SERVER"), hash)
+	r, e := http.Get(url)
+	if e != nil {
+		return false, e
+	}
+	b, _ := ioutil.ReadAll(r.Body)
+	var sr searchResult
+	json.Unmarshal(b, &sr)
+	return sr.Hits.Total != 0, nil
+}
