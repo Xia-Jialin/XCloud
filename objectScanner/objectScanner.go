@@ -1,4 +1,4 @@
-package objectscanner
+package main
 
 import (
 	"XCloud/apiServer/objects"
